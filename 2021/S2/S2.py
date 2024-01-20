@@ -1,34 +1,19 @@
-from sys import stdin
-
-rawinput = stdin.readline
-m = int(rawinput())
-n = int(rawinput())
-changes = int(rawinput())
-graph = []
-for i in range(m):
-        row = []
-        for j in range(n):
-            row.append('B')
-        graph.append(row)
-for i in range(changes):
-    change, number = map(str,rawinput().split())
-    number = int(number)
-    if change == "R":
-        for i in range(n):
-            if graph[number-1][i] == "B":
-                graph[number-1][i] = "G"
-            else:
-                graph[number-1][i] = "B"
-
-    else:
-        for i in range(m):
-            if graph[i][number-1] == "B":
-                graph[i][number-1] = "G"
-            else:
-                graph[i][number-1] = "B"
-cnt = 0
-for row in graph:
-    for char in row:
-        if char == "G":
-            cnt += 1
-print(cnt)
+def count_gold_cells_optimized(M, N, K, actions):
+    row_toggle = [False] * M
+    col_toggle = [False] * N
+    for action in actions:
+        direction, index = action[0], int(action[1]) - 1
+        if direction == 'R':
+            row_toggle[index] = not row_toggle[index]
+        else: 
+            col_toggle[index] = not col_toggle[index]
+    toggled_rows = sum(row_toggle)
+    toggled_cols = sum(col_toggle)
+    gold_cells = (toggled_rows * (N - toggled_cols)) + ((M - toggled_rows) * toggled_cols)
+    return gold_cells
+M = int(input())
+N = int(input())
+K = int(input())
+actions = [input().split() for _ in range(K)]
+gold_cells = count_gold_cells_optimized(M, N, K, actions)
+print(gold_cells)
