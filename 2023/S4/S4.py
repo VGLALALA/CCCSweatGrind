@@ -1,5 +1,15 @@
 import heapq
-def dj(graph, start, end):
+def remove_road(graph, road):
+    a1, a2, length, cost = road
+    graph[a1] = [item for item in graph[a1] if item[0] != a2]
+    graph[a2] = [item for item in graph[a2] if item[0] != a1]
+def add_road(graph, road):
+    a1, a2, length, cost = road
+    graph[a1].append((a2, length, cost))
+    graph[a2].append((a1, length, cost))
+
+import heapq
+def dj(graph, start, end, gone):
     queue = [(0, start, 0)]
     distances = {node: (float('infinity'), 0) for node in graph}
     distances[start] = (0, 0)
@@ -11,32 +21,28 @@ def dj(graph, start, end):
         if current_node not in visited:
             visited.add(current_node)
             for neighbor, distance_to_neighbor, weight_to_neighbor in graph[current_node]:
+                if (current_node, neighbor) in gone or (neighbor, current_node) in gone:
+                    continue
                 if neighbor not in visited:
                     new_distance = current_distance + distance_to_neighbor
                     new_weight = current_weight + weight_to_neighbor
-                    if new_distance < distances[neighbor][0] or (new_distance == distances[neighbor][0] and new_weight < distances[neighbor][1]):
+                    if new_distance < distances[neighbor][0] or \
+                            (new_distance == distances[neighbor][0] and new_weight < distances[neighbor][1]):
                         distances[neighbor] = (new_distance, new_weight)
                         heapq.heappush(queue, (new_distance, neighbor, new_weight))
-    return -1, -1
+    return float('inf'), float('inf')
+
+
 def thing(n,m,roads,graph):
-    def remove_road(graph, road):
-        a1, a2, length, cost = road
-        graph[a1] = [item for item in graph[a1] if item[0] != a2]
-        graph[a2] = [item for item in graph[a2] if item[0] != a1]
-    def add_road(graph, road):
-        a1, a2, length, cost = road
-        graph[a1].append((a2, length, cost))
-        graph[a2].append((a1, length, cost))
+    byebye = set()
     for road in roads:
+        byebye.add(road)
         remove_road(graph, road)
-        new_length, new_weight = dj(graph, road[0], road[1])
-        if new_length > road[2] or (new_length == road[2] and new_weight >= road[3]):
+        new_length, new_weight = dj(graph, road[0], road[1],byebye)
+        if new_length > road[2]:
+            byebye.remove(road)
             add_road(graph, road)
-        else:
-            roads.remove(road)
-    print(roads)
-    print(graph)
-    out = sum(d for a,b,c,d in roads)
+    out = sum(d for a, b, c, d in roads if (a, b, c, d) not in byebye)
     return out
 
 def take_input():

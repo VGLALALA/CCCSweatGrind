@@ -12,7 +12,7 @@ subway = [0] + list(map(int, input().split()))
 changes = []
 for _ in range(D):
     changes.append(list(map(int, input().split())))
-
+import heapq
 def find_short_dic(n, walkway):
     from queue import Queue
     dic = {}
